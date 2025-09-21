@@ -1,5 +1,10 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router";
+import { Button } from "../../common/components/button.component";
+import { Card } from "../../common/components/card.component";
+import { Container } from "../../common/components/container.component";
+import { Input } from "../../common/components/input.component";
+import { Title } from "../../common/components/title.component";
 import { GithubUtils } from "../../common/github/github.utils";
 
 export function Component() {
@@ -21,24 +26,15 @@ export function Component() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100 font-mono">
-      <div className="w-full max-w-md space-y-6 border-2 border-black bg-white p-8 shadow-[6px_6px_0_0_#000]">
-        <h1 className="text-center text-3xl font-bold text-black">
-          Easy Gist Render
-        </h1>
+    <Container className="flex h-screen items-center justify-center bg-gray-100 font-mono">
+      <Card>
+        <Title>Easy Gist Render</Title>
         <form className="space-y-6" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            ref={inputRef}
-            placeholder="Enter Gist URL"
-            className="w-full border-2 border-black bg-white px-4 py-3 text-lg text-black placeholder-gray-500 focus:outline-none"
-          />
-          <button className="w-full border-2 border-black bg-yellow-400 px-4 py-3 text-lg font-bold text-black shadow-[3px_3px_0_0_#000] transition-transform hover:shadow-none active:translate-x-[3px] active:translate-y-[3px]">
-            Render Gist
-          </button>
+          <Input ref={inputRef} placeholder="Enter Gist URL" type="text" />
+          <Button type="submit">Render Gist</Button>
         </form>
-      </div>
-    </div>
+      </Card>
+    </Container>
   );
 }
 

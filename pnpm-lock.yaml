@@ -22,6 +22,9 @@ importers:
       react-router:
         specifier: ^7.9.1
         version: 7.9.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      tailwind-merge:
+        specifier: ^3.3.1
+        version: 3.3.1
       tailwindcss:
         specifier: ^4.1.13
         version: 4.1.13
@@ -2124,6 +2127,12 @@ packages:
       }
     engines: { node: ">=8" }
 
+  tailwind-merge@3.3.1:
+    resolution:
+      {
+        integrity: sha512-gBXpgUm/3rp1lMZZrM/w7D8GKqshif0zAymAhbCyIt8KMe+0v9DQ7cdYLR4FHH/cKpdTXb+A/tKKU3eolfsI+g==,
+      }
+
   tailwindcss@4.1.13:
     resolution:
       {
@@ -3386,6 +3395,8 @@ snapshots:
   supports-color@7.2.0:
     dependencies:
       has-flag: 4.0.0
+
+  tailwind-merge@3.3.1: {}
 
   tailwindcss@4.1.13: {}
 
