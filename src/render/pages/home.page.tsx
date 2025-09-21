@@ -1,7 +1,6 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router";
 import { GithubUtils } from "../../common/github/github.utils";
-import { RoutePath } from "../../common/router/enums/route-path.enum";
 
 export function Component() {
   const navigate = useNavigate();
@@ -18,7 +17,7 @@ export function Component() {
       return;
     }
 
-    navigate(`/${RoutePath.RENDER}/${parsedUrl.id}/${parsedUrl.filename}`);
+    navigate(`${parsedUrl.id}/${parsedUrl.filename}`);
   }
 
   return (
