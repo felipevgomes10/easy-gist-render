@@ -2,12 +2,16 @@ import { useQueryState } from "nuqs";
 import { GistRenderer } from "./common/github/components/gist-renderer.component/gist-renderer.component";
 
 export function App() {
-  const [gistId] = useQueryState("gistId");
+  const [id] = useQueryState("gistId");
   const [filename] = useQueryState("filename");
 
-  if (!gistId || !filename) {
+  if (!id || !filename) {
     return null;
   }
 
-  return <GistRenderer gistId={gistId} filename={filename} />;
+  return (
+    <div className="h-full overflow-hidden">
+      <GistRenderer id={id} filename={filename} />
+    </div>
+  );
 }

@@ -1,4 +1,4 @@
 export interface GistRendererProps {
-  gistId: string;
+  id: string;
   filename: string;
 }
