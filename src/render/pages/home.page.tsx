@@ -21,19 +21,19 @@ export function Component() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md space-y-6 rounded-lg bg-white p-8 shadow-md">
-        <h1 className="text-center text-2xl font-bold text-gray-900">
+    <div className="flex h-screen items-center justify-center bg-gray-100 font-mono">
+      <div className="w-full max-w-md space-y-6 border-2 border-black bg-white p-8 shadow-[6px_6px_0_0_#000]">
+        <h1 className="text-center text-3xl font-bold text-black">
           Easy Gist Render
         </h1>
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <input
             type="text"
             ref={inputRef}
             placeholder="Enter Gist URL"
-            className="w-full rounded-md border border-gray-300 bg-gray-200 px-4 py-2 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full border-2 border-black bg-white px-4 py-3 text-lg text-black placeholder-gray-500 focus:outline-none"
           />
-          <button className="focus:ring-opacity-50 w-full rounded-md bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <button className="w-full border-2 border-black bg-yellow-400 px-4 py-3 text-lg font-bold text-black shadow-[3px_3px_0_0_#000] transition-transform hover:shadow-none active:translate-x-[3px] active:translate-y-[3px]">
             Render Gist
           </button>
         </form>
