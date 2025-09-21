@@ -1,9 +1,13 @@
 import { GetGistFetchingParams } from "./schemas/outgoing/get-gist-fetching-params.schema";
 import type { Gist } from "./schemas/incoming/gist.schema";
+import { HttpService } from "../http/http.service";
+import { RequestType } from "../http/enums/request-type.enum";
 
 export class GithubService {
-  public static create() {
-    return new GithubService();
+  private constructor(private readonly httpService: HttpService) {}
+
+  public static create(httpService = HttpService.create()) {
+    return new GithubService(httpService);
   }
 
   public async getGist(fetchingParams: GetGistFetchingParams) {
@@ -14,12 +18,15 @@ export class GithubService {
     }
 
     const { id, filename } = data;
+    const request = { url: `https://api.github.com/gists/${id}` };
 
-    const response = await fetch(`https://api.github.com/gists/${id}`);
-    const gist: Gist = await response.json();
+    const gist = await this.httpService.sendRequest<Gist>(request);
 
-    const file = await fetch(gist.files[filename].raw_url);
-
-    return file.text();
+    return this.httpService.sendRequest<string>({
+      url: gist.files[filename].raw_url,
+      options: {
+        type: RequestType.TEXT,
+      },
+    });
   }
 }
