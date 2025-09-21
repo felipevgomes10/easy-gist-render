@@ -4,6 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/easy-gist-render",
+  base: "/easy-gist-render/",
   plugins: [react(), tailwindcss()],
 });
