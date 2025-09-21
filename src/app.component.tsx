@@ -1,17 +1,12 @@
-import { useQueryState } from "nuqs";
-import { GistRenderer } from "./common/github/components/gist-renderer.component/gist-renderer.component";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "react-router";
+import { routes } from "./common/router/router.routes";
+import { queryClient } from "./common/tanstack-query/query-client.config";
 
 export function App() {
-  const [id] = useQueryState("gistId");
-  const [filename] = useQueryState("filename");
-
-  if (!id || !filename) {
-    return null;
-  }
-
   return (
-    <div className="h-full overflow-hidden">
-      <GistRenderer id={id} filename={filename} />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={routes} />
+    </QueryClientProvider>
   );
 }
