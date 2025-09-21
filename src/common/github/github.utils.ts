@@ -11,7 +11,7 @@ export class GithubUtils {
       const id = pathParts.at(1);
       const filename = GithubUtils.getFilename(urlObject);
 
-      return { id, filename: `${filename}.html` };
+      return { id, filename };
     } catch (error) {
       console.error(error);
       return null;
