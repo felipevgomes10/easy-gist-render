@@ -8,7 +8,7 @@ export class GithubUtils {
         return null;
       }
 
-      const id = pathParts.at(1);
+      const id = pathParts.at(1) as string;
       const filename = GithubUtils.getFilename(urlObject);
 
       return { id, filename };

@@ -1,7 +1,5 @@
-import { GithubService } from "../../common/github/github.service";
+import { getGistQueryOptions } from "../../common/github/hooks/use-get-gist-query.hook";
 import { queryClient } from "../../common/tanstack-query/query-client.config";
-
-const githubService = GithubService.create();
 
 export function renderPageLoader() {
   const pathnames = location.pathname.split("/").filter(Boolean);
@@ -15,8 +13,5 @@ export function renderPageLoader() {
 
   const params = { id, filename };
 
-  queryClient.ensureQueryData({
-    queryKey: ["gist", params],
-    queryFn: () => githubService.getGist(params),
-  });
+  queryClient.ensureQueryData(getGistQueryOptions(params));
 }
