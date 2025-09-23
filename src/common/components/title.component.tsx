@@ -7,7 +7,7 @@ export function Title({
   return (
     <h1
       className={twMerge(
-        "text-center text-3xl font-bold text-black",
+        "text-center text-xl font-bold text-black md:text-3xl",
         className,
       )}
     >

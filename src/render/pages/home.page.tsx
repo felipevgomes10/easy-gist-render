@@ -75,9 +75,14 @@ export function Component() {
     prefetchGist(url);
   }
 
+  function handleClearGists() {
+    localStorageService.removeItem(LocalStorageProperty.GISTS);
+    localStorageService.removeItem(LocalStorageProperty.GISTS_CACHE);
+  }
+
   return (
     <Container className="flex h-screen flex-col items-center justify-center gap-6 bg-gray-100 font-mono md:flex-row md:gap-4">
-      <Card className="h-[264px]">
+      <Card className="min-h-[264px]">
         <Title>Easy Gist Render</Title>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <Input
@@ -86,12 +91,17 @@ export function Component() {
             type="text"
             onChange={handleChange}
           />
-          <Button type="submit">Render Gist</Button>
+          <Button className="w-full px-4 py-3" type="submit">
+            Render Gist
+          </Button>
         </form>
       </Card>
       {!!gists.length && (
         <div className="flex h-[264px] w-full max-w-md flex-col gap-2">
-          <Title>Recent Gists</Title>
+          <div className="flex w-full items-center justify-between gap-1 p-2">
+            <Title>Recent Gists</Title>
+            <Button onClick={handleClearGists}>Clear</Button>
+          </div>
           <ScrollArea className="space-y-3">
             {gists.map((gist) => (
               <MiniCard
