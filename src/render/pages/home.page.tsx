@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { Trash } from "lucide-react";
 import { useRef, useState } from "react";
 import { href, useNavigate } from "react-router";
 import { Button } from "../../common/components/button.component";
@@ -22,7 +23,7 @@ export function Component() {
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [gists] = useState(() => {
+  const [gists, setGists] = useState(() => {
     return localStorageService.getItemAsArray<LocalStorageGist>(
       LocalStorageProperty.GISTS,
     );
@@ -80,6 +81,24 @@ export function Component() {
     localStorageService.removeItem(LocalStorageProperty.GISTS_CACHE);
   }
 
+  function removeGist({ id, filename }: LocalStorageGist) {
+    const updatedGists = gists.filter((gist) => {
+      return gist.id !== id && gist.filename !== filename;
+    });
+
+    setGists(updatedGists);
+    localStorageService.setItem(LocalStorageProperty.GISTS, updatedGists);
+    queryClient.removeQueries({ queryKey: ["gist", { id, filename }] });
+  }
+
+  function handleRemoveGist(
+    e: React.MouseEvent<HTMLButtonElement>,
+    gist: LocalStorageGist,
+  ) {
+    e.stopPropagation();
+    removeGist(gist);
+  }
+
   return (
     <Container className="flex h-screen flex-col items-center justify-center gap-6 bg-gray-100 font-mono md:flex-row md:gap-4">
       <Card className="min-h-[264px]">
@@ -109,7 +128,15 @@ export function Component() {
                 onClick={() => navigateToGist(gist)}
                 onMouseEnter={() => prefetchGist(gist)}
               >
-                <p className="truncate text-sm">{gist.filename}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="truncate text-sm">{gist.filename}</p>
+                  <Button
+                    data-variant="danger"
+                    onClick={(e) => handleRemoveGist(e, gist)}
+                  >
+                    <Trash />
+                  </Button>
+                </div>
               </MiniCard>
             ))}
           </ScrollArea>
