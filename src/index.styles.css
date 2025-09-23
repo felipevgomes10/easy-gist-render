@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+.neobrutalist-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.neobrutalist-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.neobrutalist-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #facc15; /* yellow-400 */
+  border: 2px solid #000;
+}

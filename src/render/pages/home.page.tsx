@@ -1,11 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { href, useNavigate } from "react-router";
 import { Button } from "../../common/components/button.component";
 import { Card } from "../../common/components/card.component";
 import { Container } from "../../common/components/container.component";
 import { Input } from "../../common/components/input.component";
 import { MiniCard } from "../../common/components/mini-card.component";
+import { ScrollArea } from "../../common/components/scroll-area.component";
 import { Title } from "../../common/components/title.component";
 import { GithubUtils } from "../../common/github/github.utils";
 import { getGistQueryOptions } from "../../common/github/hooks/use-get-gist-query.hook";
@@ -18,18 +19,18 @@ const localStorageService = LocalStorageService.create();
 
 export function Component() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const gists = localStorageService.getItemAsArray<LocalStorageGist>(
-    LocalStorageProperty.GISTS,
-  );
-  const queryClient = useQueryClient();
+  const [gists] = useState(() => {
+    return localStorageService.getItemAsArray<LocalStorageGist>(
+      LocalStorageProperty.GISTS,
+    );
+  });
 
   function getInputValue() {
     const { value = "" } = inputRef.current ?? {};
-    const parsedUrl = GithubUtils.parseGistUrl(value);
-
-    return parsedUrl;
+    return GithubUtils.parseGistUrl(value);
   }
 
   function navigateToGist(gist: LocalStorageGist) {
@@ -43,41 +44,40 @@ export function Component() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const parsedUrl = getInputValue();
+    const url = getInputValue();
 
-    if (!parsedUrl) {
+    if (!url) {
       alert("Invalid Gist URL");
       return;
     }
 
-    const gists = localStorageService.getItemAsArray<LocalStorageGist>(
-      LocalStorageProperty.GISTS,
-    );
-    const foundGist = gists.find((gist) => gist.id === parsedUrl.id);
+    const foundGist = gists.find((gist) => {
+      return gist.id === url.id && gist.filename === url.filename;
+    });
 
     if (!foundGist) {
       localStorageService.setItem(
         LocalStorageProperty.GISTS,
-        gists.concat(parsedUrl),
+        gists.concat(url),
       );
     }
 
-    navigateToGist(parsedUrl);
+    navigateToGist(url);
   }
 
-  function handleChange() {
-    const parsedUrl = getInputValue();
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const url = GithubUtils.parseGistUrl(e.target.value);
 
-    if (!parsedUrl) {
+    if (!url) {
       return;
     }
 
-    prefetchGist(parsedUrl);
+    prefetchGist(url);
   }
 
   return (
-    <Container className="flex h-screen flex-col items-center justify-center gap-4 bg-gray-100 font-mono">
-      <Card>
+    <Container className="flex h-screen flex-col items-center justify-center gap-6 bg-gray-100 font-mono md:flex-row md:gap-4">
+      <Card className="h-[264px]">
         <Title>Easy Gist Render</Title>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <Input
@@ -89,18 +89,22 @@ export function Component() {
           <Button type="submit">Render Gist</Button>
         </form>
       </Card>
-      <div className="mt-8 flex w-full max-w-md flex-col gap-1 space-y-4">
-        <Title>Recent Gists</Title>
-        {gists.map((gist) => (
-          <MiniCard
-            key={`${gist.id}/${gist.filename}`}
-            onClick={() => navigateToGist(gist)}
-            onMouseEnter={() => prefetchGist(gist)}
-          >
-            <p className="truncate text-sm">{gist.filename}</p>
-          </MiniCard>
-        ))}
-      </div>
+      {!!gists.length && (
+        <div className="flex h-[264px] w-full max-w-md flex-col gap-2">
+          <Title>Recent Gists</Title>
+          <ScrollArea className="space-y-3">
+            {gists.map((gist) => (
+              <MiniCard
+                key={`${gist.id}/${gist.filename}`}
+                onClick={() => navigateToGist(gist)}
+                onMouseEnter={() => prefetchGist(gist)}
+              >
+                <p className="truncate text-sm">{gist.filename}</p>
+              </MiniCard>
+            ))}
+          </ScrollArea>
+        </div>
+      )}
     </Container>
   );
 }
