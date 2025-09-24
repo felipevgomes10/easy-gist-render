@@ -7,6 +7,7 @@ export const Gist = z.object({
       raw_url: z.url(),
     }),
   ),
+  html_url: z.url(),
 });
 
 export type Gist = z.infer<typeof Gist>;

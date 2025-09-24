@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash } from "lucide-react";
+import { Copy, Trash } from "lucide-react";
 import { useRef, useState } from "react";
 import { href, useNavigate } from "react-router";
 import { Button } from "../../common/components/button.component";
@@ -45,35 +45,35 @@ export function Component() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const url = getInputValue();
+    const parsedUrl = getInputValue();
 
-    if (!url) {
+    if (!parsedUrl) {
       alert("Invalid Gist URL");
       return;
     }
 
     const foundGist = gists.find((gist) => {
-      return gist.id === url.id && gist.filename === url.filename;
+      return gist.id === parsedUrl.id && gist.filename === parsedUrl.filename;
     });
 
     if (!foundGist) {
       localStorageService.setItem(
         LocalStorageProperty.GISTS,
-        gists.concat(url),
+        gists.concat(parsedUrl),
       );
     }
 
-    navigateToGist(url);
+    navigateToGist(parsedUrl);
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const url = GithubUtils.parseGistUrl(e.target.value);
+    const parsedUrl = GithubUtils.parseGistUrl(e.target.value);
 
-    if (!url) {
+    if (!parsedUrl) {
       return;
     }
 
-    prefetchGist(url);
+    prefetchGist(parsedUrl);
   }
 
   function handleClearGists() {
@@ -99,6 +99,18 @@ export function Component() {
     removeGist(gist);
   }
 
+  async function copyGistUrl(gist: LocalStorageGist) {
+    await navigator.clipboard.writeText(gist.url);
+  }
+
+  function handleCopyGistUrl(
+    e: React.MouseEvent<HTMLButtonElement>,
+    gist: LocalStorageGist,
+  ) {
+    e.stopPropagation();
+    copyGistUrl(gist);
+  }
+
   return (
     <Container className="flex h-screen flex-col items-center justify-center gap-6 bg-gray-100 font-mono md:flex-row md:gap-4">
       <Card className="min-h-[264px]">
@@ -119,7 +131,9 @@ export function Component() {
         <div className="flex h-[264px] w-full max-w-md flex-col gap-2">
           <div className="flex w-full items-center justify-between gap-1 p-2">
             <Title>Recent Gists</Title>
-            <Button onClick={handleClearGists}>Clear</Button>
+            <Button data-variant="danger" onClick={handleClearGists}>
+              Clear
+            </Button>
           </div>
           <ScrollArea className="space-y-3">
             {gists.map((gist) => (
@@ -130,12 +144,17 @@ export function Component() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <p className="truncate text-sm">{gist.filename}</p>
-                  <Button
-                    data-variant="danger"
-                    onClick={(e) => handleRemoveGist(e, gist)}
-                  >
-                    <Trash />
-                  </Button>
+                  <div className="space-x-2">
+                    <Button onClick={(e) => handleCopyGistUrl(e, gist)}>
+                      <Copy />
+                    </Button>
+                    <Button
+                      data-variant="danger"
+                      onClick={(e) => handleRemoveGist(e, gist)}
+                    >
+                      <Trash />
+                    </Button>
+                  </div>
                 </div>
               </MiniCard>
             ))}

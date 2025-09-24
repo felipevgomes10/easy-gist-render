@@ -2,6 +2,7 @@ import { GetGistFetchingParams } from "./schemas/outgoing/get-gist-fetching-para
 import type { Gist } from "./schemas/incoming/gist.schema";
 import { HttpService } from "../http/http.service";
 import { RequestType } from "../http/enums/request-type.enum";
+import { GetGistResponse } from "./schemas/incoming/gist-response.schema";
 
 export class GithubService {
   private constructor(private readonly httpService: HttpService) {}
@@ -22,11 +23,16 @@ export class GithubService {
 
     const gist = await this.httpService.sendRequest<Gist>(request);
 
-    return this.httpService.sendRequest<string>({
+    const content = await this.httpService.sendRequest<string>({
       url: gist.files[filename].raw_url,
       options: {
         type: RequestType.TEXT,
       },
+    });
+
+    return GetGistResponse.parse({
+      url: gist.html_url,
+      content,
     });
   }
 }

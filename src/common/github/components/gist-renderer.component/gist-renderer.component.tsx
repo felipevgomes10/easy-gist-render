@@ -8,5 +8,7 @@ export function GistRenderer({ id, filename }: Readonly<GistRendererProps>) {
     return <div className="text-red-600">{error.message}</div>;
   }
 
-  return <iframe srcDoc={data} className="h-screen w-full border-none" />;
+  return (
+    <iframe srcDoc={data?.content} className="h-screen w-full border-none" />
+  );
 }

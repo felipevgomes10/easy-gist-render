@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import z from "zod";
 import { Button } from "../../common/components/button.component";
 import { GistRenderer } from "../../common/github/components/gist-renderer.component/gist-renderer.component";
+import { getGistQueryOptions } from "../../common/github/hooks/use-get-gist-query.hook";
 import type { LocalStorageGist } from "../../common/github/schemas/local-storage-gist.schema";
 import { LocalStorageProperty } from "../../common/local-storage/local-storage-property.enum";
 import { LocalStorageService } from "../../common/local-storage/local-storage.service";
@@ -34,12 +35,16 @@ export function Component() {
     });
 
     if (!foundGist) {
-      localStorageService.setItem(
-        LocalStorageProperty.GISTS,
-        gists.concat({ id, filename }),
-      );
+      queryClient
+        .ensureQueryData(getGistQueryOptions({ id, filename }))
+        .then(({ url }) => {
+          localStorageService.setItem(
+            LocalStorageProperty.GISTS,
+            gists.concat({ id, filename, url }),
+          );
+        });
     }
-  }, [filename, id]);
+  }, [filename, id, queryClient]);
 
   function handleGistRefresh() {
     queryClient.invalidateQueries({ queryKey: ["gist", { id, filename }] });
