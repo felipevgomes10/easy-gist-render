@@ -1,13 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Copy, Trash } from "lucide-react";
+import { Copy, FileText, Trash } from "lucide-react";
 import { useRef, useState } from "react";
-import { href, useNavigate } from "react-router";
+import { href, useNavigate, useSearchParams } from "react-router";
 import { Button } from "../../common/components/button.component";
 import { Card } from "../../common/components/card.component";
 import { Container } from "../../common/components/container.component";
 import { Input } from "../../common/components/input.component";
 import { MiniCard } from "../../common/components/mini-card.component";
 import { ScrollArea } from "../../common/components/scroll-area.component";
+import { SearchBar } from "../../common/components/search-bar/search-bar.component";
 import { Title } from "../../common/components/title.component";
 import { GithubUtils } from "../../common/github/github.utils";
 import { getGistQueryOptions } from "../../common/github/hooks/use-get-gist-query.hook";
@@ -15,11 +16,16 @@ import type { LocalStorageGist } from "../../common/github/schemas/local-storage
 import type { GetGistFetchingParams } from "../../common/github/schemas/outgoing/get-gist-fetching-params.schema";
 import { LocalStorageProperty } from "../../common/local-storage/local-storage-property.enum";
 import { LocalStorageService } from "../../common/local-storage/local-storage.service";
+import { RouteQuery } from "../../common/router/enums/route-query.enum";
 
 const localStorageService = LocalStorageService.create();
 
 export function Component() {
   const navigate = useNavigate();
+
+  const [query, setQuery] = useSearchParams();
+  const search = query.get(RouteQuery.SEARCH) ?? "";
+
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -28,6 +34,7 @@ export function Component() {
       LocalStorageProperty.GISTS,
     );
   });
+  const filteredGists = gists.filter((gist) => gist.filename.includes(search));
 
   function getInputValue() {
     const { value = "" } = inputRef.current ?? {};
@@ -119,6 +126,20 @@ export function Component() {
     copyGistUrl(gist);
   }
 
+  function handleGistSearch(search: string) {
+    setQuery((query) => {
+      if (search) {
+        query.set(RouteQuery.SEARCH, search);
+      }
+
+      if (!search) {
+        query.delete(RouteQuery.SEARCH);
+      }
+
+      return query;
+    });
+  }
+
   return (
     <Container className="flex h-screen flex-col items-center justify-center gap-6 bg-gray-100 font-mono md:flex-row md:gap-4">
       <Card className="min-h-[264px]">
@@ -143,16 +164,26 @@ export function Component() {
               Clear
             </Button>
           </div>
+          <SearchBar
+            placeholder="Search a Gist by name"
+            className="pr-2"
+            onSearch={handleGistSearch}
+          />
           <ScrollArea className="space-y-3">
-            {gists.map((gist) => (
+            {filteredGists.map((gist) => (
               <MiniCard
                 key={`${gist.id}/${gist.filename}`}
                 onClick={() => navigateToGist(gist)}
                 onMouseEnter={() => prefetchGist(gist)}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm">{gist.filename}</p>
-                  <div className="space-x-2">
+                  <div className="flex items-center gap-2">
+                    <FileText />
+                    <span className="w-full max-w-[250px] truncate text-sm">
+                      {gist.filename}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <Button onClick={(e) => handleCopyGistUrl(e, gist)}>
                       <Copy />
                     </Button>
