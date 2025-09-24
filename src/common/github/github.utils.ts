@@ -18,6 +18,10 @@ export class GithubUtils {
     }
   }
 
+  public static identifyGist(id: string, filename: string) {
+    return `${id}-${filename}`;
+  }
+
   public static getFilename(url: URL) {
     return url.hash.replace("#file-", "").replace(/-\w+$/, "");
   }

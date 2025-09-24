@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import z from "zod";
 import { Button } from "../../common/components/button.component";
 import { GistRenderer } from "../../common/github/components/gist-renderer.component/gist-renderer.component";
+import { GithubUtils } from "../../common/github/github.utils";
 import { getGistQueryOptions } from "../../common/github/hooks/use-get-gist-query.hook";
 import type { LocalStorageGist } from "../../common/github/schemas/local-storage-gist.schema";
 import { LocalStorageProperty } from "../../common/local-storage/local-storage-property.enum";
@@ -31,7 +32,10 @@ export function Component() {
     );
 
     const foundGist = gists.find((gist) => {
-      return gist.id === id && gist.filename === filename;
+      return (
+        GithubUtils.identifyGist(gist.id, gist.filename) ===
+        GithubUtils.identifyGist(id, filename)
+      );
     });
 
     if (!foundGist) {
@@ -40,14 +44,39 @@ export function Component() {
         .then(({ url }) => {
           localStorageService.setItem(
             LocalStorageProperty.GISTS,
-            gists.concat({ id, filename, url }),
+            gists.concat({ id, filename, url: `${url}#file${filename}-html` }),
           );
         });
     }
   }, [filename, id, queryClient]);
 
-  function handleGistRefresh() {
-    queryClient.invalidateQueries({ queryKey: ["gist", { id, filename }] });
+  async function handleGistRefresh() {
+    const queryOptions = getGistQueryOptions({ id, filename });
+
+    queryClient.invalidateQueries({ queryKey: queryOptions.queryKey });
+    queryClient.cancelQueries({ queryKey: queryOptions.queryKey });
+
+    const gist = await queryClient.ensureQueryData(queryOptions);
+
+    const gists = localStorageService.getItemAsArray<LocalStorageGist>(
+      LocalStorageProperty.GISTS,
+    );
+
+    const filteredGists = gists.filter((gist) => {
+      return (
+        GithubUtils.identifyGist(gist.id, gist.filename) !==
+        GithubUtils.identifyGist(id, filename)
+      );
+    });
+
+    localStorageService.setItem(
+      LocalStorageProperty.GISTS,
+      filteredGists.concat({
+        id,
+        filename,
+        url: `${gist.url}#file${filename}-html`,
+      }),
+    );
   }
 
   if (!id || !filename) {

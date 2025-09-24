@@ -53,7 +53,10 @@ export function Component() {
     }
 
     const foundGist = gists.find((gist) => {
-      return gist.id === parsedUrl.id && gist.filename === parsedUrl.filename;
+      return (
+        GithubUtils.identifyGist(gist.id, gist.filename) ===
+        GithubUtils.identifyGist(parsedUrl.id, parsedUrl.filename)
+      );
     });
 
     if (!foundGist) {
@@ -82,13 +85,18 @@ export function Component() {
   }
 
   function removeGist({ id, filename }: LocalStorageGist) {
+    const queryOptions = getGistQueryOptions({ id, filename });
+
     const updatedGists = gists.filter((gist) => {
-      return gist.id !== id && gist.filename !== filename;
+      return (
+        GithubUtils.identifyGist(gist.id, gist.filename) !==
+        GithubUtils.identifyGist(id, filename)
+      );
     });
 
     setGists(updatedGists);
     localStorageService.setItem(LocalStorageProperty.GISTS, updatedGists);
-    queryClient.removeQueries({ queryKey: ["gist", { id, filename }] });
+    queryClient.removeQueries({ queryKey: queryOptions.queryKey });
   }
 
   function handleRemoveGist(
