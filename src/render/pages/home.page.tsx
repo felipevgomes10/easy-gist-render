@@ -5,6 +5,7 @@ import { href, useNavigate, useSearchParams } from "react-router";
 import { Button } from "../../common/components/button.component";
 import { Card } from "../../common/components/card.component";
 import { Container } from "../../common/components/container.component";
+import { ErrorComponent } from "../../common/components/error/error.component";
 import { Input } from "../../common/components/input.component";
 import { MiniCard } from "../../common/components/mini-card.component";
 import { ScrollArea } from "../../common/components/scroll-area.component";
@@ -205,3 +206,7 @@ export function Component() {
 }
 
 Component.displayName = "HomePage";
+
+export function ErrorBoundary() {
+  return <ErrorComponent message="Oops, something went wrong!" />;
+}

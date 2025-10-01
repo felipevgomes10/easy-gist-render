@@ -1,11 +1,12 @@
-import { useGetGistQuery } from "../../hooks/use-get-gist-query.hook";
+import { ErrorComponent } from "../../../components/error/error.component";
+import { useGetGistSuspenseQuery } from "../../hooks/use-get-gist-query.hook";
 import type { GistRendererProps } from "./gist-renderer.types";
 
 export function GistRenderer({ id, filename }: Readonly<GistRendererProps>) {
-  const { data, error } = useGetGistQuery({ id, filename });
+  const { data, error } = useGetGistSuspenseQuery({ id, filename });
 
   if (error) {
-    return <div className="text-red-600">{error.message}</div>;
+    return <ErrorComponent message={error.message} />;
   }
 
   return (

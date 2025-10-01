@@ -1,9 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Home, RefreshCw } from "lucide-react";
-import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import z from "zod";
 import { Button } from "../../common/components/button.component";
+import { ErrorComponent } from "../../common/components/error/error.component";
 import { GistRenderer } from "../../common/github/components/gist-renderer.component/gist-renderer.component";
 import { GithubUtils } from "../../common/github/github.utils";
 import { getGistQueryOptions } from "../../common/github/hooks/use-get-gist-query.hook";
@@ -26,35 +26,9 @@ export function Component() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const gists = localStorageService.getItemAsArray<LocalStorageGist>(
-      LocalStorageProperty.GISTS,
-    );
-
-    const foundGist = gists.find((gist) => {
-      return (
-        GithubUtils.identifyGist(gist.id, gist.filename) ===
-        GithubUtils.identifyGist(id, filename)
-      );
-    });
-
-    if (!foundGist) {
-      queryClient
-        .ensureQueryData(getGistQueryOptions({ id, filename }))
-        .then(({ url }) => {
-          localStorageService.setItem(
-            LocalStorageProperty.GISTS,
-            gists.concat({ id, filename, url: `${url}#file${filename}-html` }),
-          );
-        });
-    }
-  }, [filename, id, queryClient]);
-
   async function handleGistRefresh() {
     const queryOptions = getGistQueryOptions({ id, filename });
-
     queryClient.invalidateQueries({ queryKey: queryOptions.queryKey });
-    queryClient.cancelQueries({ queryKey: queryOptions.queryKey });
 
     const gist = await queryClient.ensureQueryData(queryOptions);
 
@@ -74,7 +48,7 @@ export function Component() {
       filteredGists.concat({
         id,
         filename,
-        url: `${gist.url}#file${filename}-html`,
+        url: `${gist.url}#file-${filename}-html`,
       }),
     );
   }
@@ -99,3 +73,7 @@ export function Component() {
 }
 
 Component.displayName = "RendererComponent";
+
+export function ErrorBoundary() {
+  return <ErrorComponent message="Oops, something went wrong!" />;
+}
