@@ -10,6 +10,6 @@ export function GistRenderer({ id, filename }: Readonly<GistRendererProps>) {
   }
 
   return (
-    <iframe srcDoc={data?.content} className="h-screen w-full border-none" />
+    <iframe srcDoc={data.content} className="h-screen w-full border-none" />
   );
 }
